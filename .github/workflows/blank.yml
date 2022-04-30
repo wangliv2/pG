@@ -1,10 +1,9 @@
 name: Fingers GB
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: 
-      # 北京时间 周五 05:17
-      - "17 25 * * 4"
+    - cron: 17 21 * * 4
 
 jobs:
   setup:
@@ -32,4 +31,4 @@ jobs:
       - name: Push
         run: |
           echo "${{ env.FAKE_HASH }}" > hobby.tnt
-          git add . && git commit -m "${{ env.FAKE_HASH }}" && git push -f
+          git add . && git commit -m "${{ env.FAKE_HASH }}" && git push -f    
