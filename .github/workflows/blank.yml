@@ -1,9 +1,9 @@
-name: Fingers GB
+name: GET GB
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: 17 21 * * 4
+    - cron: 17 26 * * 4
 
 jobs:
   setup:
