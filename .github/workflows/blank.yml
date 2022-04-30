@@ -1,0 +1,35 @@
+name: Fingers GB
+
+on:
+  schedule:
+    - cron: 
+      # 北京时间 周五 05:17
+      - "17 25 * * 4"
+
+jobs:
+  setup:
+    env:
+      EPΙC_EMAΙL: ${{ secrets.EPIC_EMAIL }}
+      EPΙC_PASSWΟRD: ${{ secrets.EPIC_PASSWORD }}
+      PUSHER_TELEGRAM: ${{ secrets.PUSHER_TELEGRAM }}
+      PLAYER: ${{ secrets.EPIC_PLAYER }}
+      COOKIE: ${{ secrets.COOKIE }}
+      FAKE_HASH: "Automated deployment @ $(date '+%Y-%m-%d %H:%M:%S') Asia/Shanghai"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Scaffold Claim
+        run: |
+          docker run --rm --pull always \
+          -e EPΙC_EMAΙL \
+          -e EPΙC_PASSWΟRD \
+          -e PUSHER_TELEGRAM \
+          -e PLAYER \
+          -v $(pwd):/home/epic/database/cookies/ \
+          ech0sec/awesome-epic:daddy python3 main.py claim
+      - name: Setup GIT user
+        uses: fregante/setup-git-user@v1
+      - name: Push
+        run: |
+          echo "${{ env.FAKE_HASH }}" > hobby.tnt
+          git add . && git commit -m "${{ env.FAKE_HASH }}" && git push -f
