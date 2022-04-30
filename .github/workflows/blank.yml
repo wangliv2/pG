@@ -3,7 +3,7 @@ name: GET GB
 on:
   workflow_dispatch:
   schedule:
-    - cron: 17 26 * * 4
+    - cron: 20 21 * * 4
 
 jobs:
   setup:
