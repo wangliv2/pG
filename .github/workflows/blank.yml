@@ -27,7 +27,7 @@ jobs:
         cd epic/src
         echo "EPIC_EMAIL: ${{ secrets.EPIC_EMAIL }}" >> config.yaml
         echo "EPIC_PASSWORD: ${{ secrets.EPIC_PASSWORD }}" >> config.yaml
-        echo "PUSHER_TELEGRAM: ${{ secrets.PUSHER_SERVERCHAN }}" >> config.yaml
+        echo "PUSHER_TELEGRAM: ${{ secrets.PUSHER_TELEGRAM }}" >> config.yaml
         echo "PLAYER: ${{ secrets.PLAYER }}" >>config.yaml
     - name: 安装依赖
       run: |
@@ -51,4 +51,4 @@ jobs:
         rm -rf epic
         git add .
         git commit -m "${{ env.FAKE_HASH }}" 
-        git push -f     
+        git push -f    
