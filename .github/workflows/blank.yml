@@ -3,32 +3,52 @@ name: GET GB
 on:
   workflow_dispatch:
   schedule:
-    - cron: 20 21 * * 4
+    - cron: "29 10 * * 3" # 修改你的定时配置
 
 jobs:
   setup:
     env:
-      EPΙC_EMAΙL: ${{ secrets.EPIC_EMAIL }}
-      EPΙC_PASSWΟRD: ${{ secrets.EPIC_PASSWORD }}
-      PUSHER_TELEGRAM: ${{ secrets.PUSHER_TELEGRAM }}
-      PLAYER: ${{ secrets.EPIC_PLAYER }}
-      COOKIE: ${{ secrets.COOKIE }}
+      COMMAND_CLAIM: "xvfb-run python main.py claim"
+      COMMAND_GET: "xvfb-run python main.py get"
+      COMMAND_UNREAL: "xvfb-run python main.py unreal"
       FAKE_HASH: "Automated deployment @ $(date '+%Y-%m-%d %H:%M:%S') Asia/Shanghai"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Scaffold Claim
-        run: |
-          docker run --rm --pull always \
-          -e EPΙC_EMAΙL \
-          -e EPΙC_PASSWΟRD \
-          -e PUSHER_TELEGRAM \
-          -e PLAYER \
-          -v $(pwd):/home/epic/database/cookies/ \
-          ech0sec/awesome-epic:daddy python3 main.py claim
-      - name: Setup GIT user
-        uses: fregante/setup-git-user@v1
-      - name: Push
-        run: |
-          echo "${{ env.FAKE_HASH }}" > hobby.tnt
-          git add . && git commit -m "${{ env.FAKE_HASH }}" && git push -f    
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+    - name: 初始化环境 & 拉取项目
+      run: |
+        sudo timedatectl set-timezone "Asia/Shanghai"
+        git clone https://github.com/QIN2DIM/epic-awesome-gamer.git epic
+    - name: 初始化配置文件
+      run: |
+        cd epic/src
+        echo "EPIC_EMAIL: ${{ secrets.EPIC_EMAIL }}" >> config.yaml
+        echo "EPIC_PASSWORD: ${{ secrets.EPIC_PASSWORD }}" >> config.yaml
+        echo "PUSHER_TELEGRAM: ${{ secrets.PUSHER_SERVERCHAN }}" >> config.yaml
+        echo "PLAYER: ${{ secrets.PLAYER }}" >>config.yaml
+    - name: 安装依赖
+      run: |
+        pip install -r epic/requirements.txt
+        cd epic/src/ && python main.py install
+    - name: 启动项目
+      run: |
+        if [ -d "database" ];then cp -rfp database epic/src/; fi
+        cd epic/src/
+        ${{ env.COMMAND_CLAIM }}
+        # ${{ env.COMMAND_GET }} # Optional
+        # ${{ env.COMMAND_UNREAL }} # Optional
+    - name: Setup GIT user
+      uses: fregante/setup-git-user@v1
+    - name: 缓存身份令牌
+      run: |
+        if [ -d "epic/src/database" ];then cp -rfp epic/src/database .; fi
+        if [ -f "epic/src/datas/logs/runtime.log" ];then cp epic/src/datas/logs/runtime.log datas.log; fi
+        cp epic/src/database/logs/runtime.log .
+        echo "${{ env.FAKE_HASH }}" > _token
+        rm -rf epic
+        git add .
+        git commit -m "${{ env.FAKE_HASH }}" 
+        git push -f     
